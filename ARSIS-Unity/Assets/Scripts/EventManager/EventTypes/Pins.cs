@@ -12,7 +12,9 @@ using UnityEngine;
 //         "name":"",
 //         "id":"884fbd3e-f432-4873-a151-86519c33c4aa",
 //         "x":481,
-//         "y":403
+//         "y":403,
+//         "northing": int,
+//         "easting": int
 //     },
 //     "coordinates":[-95.08192908,29.56532568]
 //  },
@@ -36,6 +38,8 @@ namespace ARSIS.EventManager
         public string id { get; set; }
         public int x { get; set; }
         public int y { get; set; }
+        public int northing { get; set; }
+        public int easting { get; set; }
     }
 
     [System.Serializable]
@@ -61,13 +65,12 @@ namespace ARSIS.EventManager
                 "properties: ",
                 //$"\tname: {this.data.pinsProperties.name}",
                 //$"\tname: {this.data.pinsProperties.id}",
-                $"\tx: {data.properties.x}",
-                $"\ty: {data.properties.y}"
+                $"\tname: {data.properties.name}", //UTM
+                $"\tx: {data.properties.x}",// UTM
+                $"\ty: {data.properties.y}" //UTM
                 //$"\tname: {this.data.coordinates}"
                 //$"\tname: {this.data.coordinates}"
                 // $"\tid: {this.data.id}",
-                // $"\tx: {this.data.x}",
-                // $"\ty: + {this.data.y}",
             );
         }
     }

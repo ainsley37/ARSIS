@@ -6,6 +6,8 @@ from fastapi import APIRouter
 # from app.routers.on_server_navigation.default_paths import paths, paths_json
 from app.routers.on_server_navigation.create_path import CreatePath
 import rasterio
+from rasterio.crs import CRS
+from rasterio.warp import transform
 import uuid
 import geojson
 from geojson import Point, LineString
@@ -44,7 +46,21 @@ def create_point(point: PointBody):
     x, y, lon, lat, properties = (point.x, point.y, point.lon, point.lat, point.properties)
     # do not use "falsy" values (e.g. 0 is evaluated as false)
     if x != None and y != None:
-        lon, lat = dataset.xy(x, y) # convert pixel to lat/lon
+        #lon, lat = dataset.xy(-y+dataset.width, -x+dataset.height) # convert pixel to lat/lon
+        #lon, lat = dataset.xy(-x, -y+dataset.width) # convert pixel to lat/lon, x and z appear flipped
+        lon, lat = dataset.xy(y, x) # convert pixel to lat/lon, appears correct
+
+        #lon, lat = dataset.xy(-y, x) # convert pixel to lat/lon, x and z appear flipped
+       
+        #lon, lat = dataset.xy(-y+dataset.height, x) # convert pixel to lat/lon, z is flipped, gets lower as point moves further away
+
+        #lon, lat = dataset.xy(-y+dataset.height, -x+dataset.width) # convert pixel to lat/lon, x and z appear flipped
+
+        #lon, lat = dataset.xy(-x+dataset.height, -y+dataset.width) # convert pixel to lat/lon, x and z appear flipped
+
+        #lon, lat = dataset.xy(-x+dataset.width, -y+dataset.height) # convert pixel to lat/lon
+        #lon, lat = dataset.xy(x, -y+dataset.height) # convert pixel to lat/lon
+        #lon, lat = dataset.xy(x, y) # convert pixel to lat/lon
     elif lat != None and lon != None:
         y, x = ~dataset.transform * (lon, lat) # convert lat/lon to pixel
     else:
@@ -52,7 +68,18 @@ def create_point(point: PointBody):
     properties["id"] = str(uuid.uuid4()) if "id" not in properties else properties["id"]
     properties["x"] = int(x)
     properties["y"] = int(y)
+    (north, east) = from_ll_to_utm(lon, lat)
+    properties["northing"] = int(north)
+    properties["easting"] = int(east)
     return Point((lon, lat), properties=properties)
+
+def from_ll_to_utm(lon: float, lat: float):
+    ([east,*_], [north, *_], *_) = transform(
+        dataset.crs,
+        CRS.from_epsg(32615),
+        [lon], [lat]
+    )
+    return (north, east)              
 
 @router.post("/" + pins_key)
 async def translate(point: PointBody):
