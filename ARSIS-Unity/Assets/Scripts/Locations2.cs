@@ -74,9 +74,10 @@ public class Locations2 : MonoBehaviour, IRenderable
         // Vector3 virtual coordinates Translate(activePin, eva, heading)
         // set the position of the visible pin to the virtual coordinates
         Vector2 activePinUTM = new Vector2(activePin.data.properties.easting, activePin.data.properties.northing);
-        // Vector2 userUTM = new Vector2(evaData.posx, evaData.posy);
-        Vector2 userUTM = new Vector2(298305, 3272330); // test UTM
-        float userHeading = evaData.heading;
+        Vector2 userUTM = new Vector2(evaData.posx, evaData.posy);
+        //Vector2 userUTM = new Vector2(298305, 3272330); // test UTM
+        //float userHeading = evaData.heading;
+        float userHeading = 0; 
         Vector3 virtualPinCoordinates = CoordinatesUtility.TranslateToVirtual(activePinUTM, userUTM, userHeading);
         visiblePin.transform.position = virtualPinCoordinates;
     }
